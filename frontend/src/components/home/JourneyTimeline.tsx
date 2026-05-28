@@ -122,30 +122,46 @@ function Node({ step, index, total, progress, threshold }: any) {
       className="absolute" 
       style={{ left: leftPosition, top: `calc(50% + ${yOffset}px)`, transform: 'translate(-50%, -50%)' }}
     >
+      {/* Connecting Line from Node to Card */}
       <motion.div 
         style={{ opacity: activeOpacity }}
-        className={`absolute w-32 md:w-48 text-center ${isEven ? 'bottom-16 md:bottom-20' : 'top-16 md:top-20'} left-1/2 -translate-x-1/2`}
+        className={`absolute left-1/2 w-[1px] border-l border-dashed border-saffron/30 ${isEven ? 'bottom-8 h-12 md:h-16' : 'top-8 h-12 md:h-16'} -translate-x-1/2`}
+      />
+
+      {/* Glassmorphic Text Card */}
+      <motion.div 
+        style={{ opacity: activeOpacity }}
+        className={`absolute w-48 md:w-64 text-center ${isEven ? 'bottom-20 md:bottom-28' : 'top-20 md:top-28'} left-1/2 -translate-x-1/2`}
       >
-        <h4 className="font-heading font-bold text-[10px] md:text-sm text-foreground mb-1 leading-tight">{step.title}</h4>
-        <p className="text-[8px] md:text-[10px] text-muted-foreground leading-tight hidden md:block">{step.desc}</p>
+        <div className="bg-card/80 backdrop-blur-md border border-border/50 shadow-2xl p-4 md:p-5 rounded-2xl hover:bg-card hover:border-saffron/30 transition-colors duration-300 group">
+          <h4 className="font-heading font-bold text-sm md:text-lg text-foreground mb-1 md:mb-2 leading-tight group-hover:text-saffron transition-colors">{step.title}</h4>
+          <p className="text-xs md:text-sm text-muted-foreground leading-relaxed hidden md:block">{step.desc}</p>
+        </div>
       </motion.div>
 
+      {/* Pulsing Aura Behind Active Node */}
+      <motion.div
+        style={{ opacity: activeOpacity, scale: useTransform(progress, [threshold - 0.2, threshold], [0.5, 1.5]) }}
+        className="absolute inset-0 bg-saffron/20 blur-xl rounded-full -z-10"
+      />
+
+      {/* The Node Itself */}
       <motion.div 
         style={{ scale }}
-        className="relative z-10 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center bg-card shadow-xl overflow-hidden"
+        className="relative z-10 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center bg-card shadow-xl overflow-hidden ring-4 ring-background"
       >
         {/* Inactive state background */}
         <motion.div 
           style={{ opacity: overlayOpacity }}
-          className="absolute inset-0 bg-muted border-4 border-border rounded-full" 
+          className="absolute inset-0 bg-muted border border-border rounded-full" 
         />
         
         {/* Active state background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-saffron to-saffron-light border-4 border-saffron/30 rounded-full" />
+        <div className="absolute inset-0 bg-gradient-to-br from-saffron to-saffron-light shadow-[inset_0_-2px_10px_rgba(0,0,0,0.2)] rounded-full" />
 
         {/* Icon (always above backgrounds) */}
-        <div className="relative z-20 text-white mix-blend-overlay">
-          <step.icon size={20} className="md:w-8 md:h-8" />
+        <div className="relative z-20 text-white mix-blend-overlay drop-shadow-md">
+          <step.icon size={20} className="md:w-7 md:h-7" />
         </div>
       </motion.div>
     </div>

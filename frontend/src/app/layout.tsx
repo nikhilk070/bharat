@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} ${rajdhani.variable}`} suppressHydrationWarning>
       <body className="antialiased bg-background text-foreground min-h-screen flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <ClientLayout>{children}</ClientLayout>
         </ThemeProvider>
       </body>

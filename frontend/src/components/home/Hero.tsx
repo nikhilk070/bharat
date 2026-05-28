@@ -47,7 +47,7 @@ const TypewriterHeading = () => {
 
   return (
     <div className="min-h-[90px] md:min-h-[80px] flex items-center justify-start mb-6">
-      <h1 className="h1 !mb-0 text-left w-full !text-3xl md:!text-4xl lg:!text-5xl leading-tight" style={{ textAlign: 'justify', textJustify: 'inter-word' }}>
+      <h1 className="h1 !mb-0 text-left w-full !text-3xl md:!text-4xl lg:!text-5xl leading-tight">
         {displayedText}
         <motion.span
           animate={{ opacity: [1, 0] }}
