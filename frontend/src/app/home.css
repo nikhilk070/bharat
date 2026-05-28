@@ -16,14 +16,14 @@
 
         html:has(#hero) {
             scroll-behavior: smooth;
-            overflow-x: hidden;
+            overflow-x: clip;
         }
 
         body:has(#hero) {
             background: var(--bg);
             color: var(--dark);
             font-family: var(--fb);
-            overflow-x: hidden;
+            overflow-x: clip;
             cursor: none;
         }
 

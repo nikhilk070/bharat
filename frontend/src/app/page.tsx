@@ -1,4 +1,5 @@
 import Hero from "@/components/home/Hero";
+import JourneyTimeline from "@/components/home/JourneyTimeline";
 import Marquee from "@/components/home/Marquee";
 import Verticals from "@/components/home/Verticals";
 import CXONetwork from "@/components/home/CXONetwork";
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <JourneyTimeline />
       <Marquee />
       <Verticals />
       <CXONetwork />

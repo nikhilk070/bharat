@@ -26,12 +26,16 @@ export default function Navbar() {
         <li><Link href="/investors">Investors</Link></li>
         <li><Link href="/vivachana">Vivechana</Link></li>
       </ul>
-      <div style={{ display: 'flex', gap: '1rem' }}>
+      <div className="flex items-center gap-4">
         <Link href="/login">
-          <button className="nb" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)' }}>Access Portal</button>
+          <button className="px-5 py-2.5 rounded-lg font-heading font-bold uppercase tracking-widest text-[11px] border border-border bg-transparent text-foreground hover:bg-muted transition-colors">
+            Access Portal
+          </button>
         </Link>
         <Link href="/accelerator/apply">
-          <button className="nb">Apply Now</button>
+          <button className="px-5 py-2.5 rounded-lg font-heading font-bold uppercase tracking-widest text-[11px] bg-saffron text-white hover:bg-saffron-light transition-colors">
+            Apply Now
+          </button>
         </Link>
       </div>
     </nav>

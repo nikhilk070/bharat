@@ -51,7 +51,7 @@ export default function LoginPage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass p-10 md:p-14 rounded-3xl border border-white/10 w-full max-w-md relative z-10"
+        className="bg-card p-10 md:p-14 rounded-3xl border border-border w-full max-w-md relative z-10 shadow-2xl"
       >
         <div className="text-center mb-8">
           <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="mx-auto mb-4">
@@ -60,8 +60,8 @@ export default function LoginPage() {
               <rect x="20" y="25" width="35" height="55" rx="8" fill="#1A9E5A" transform="skewX(-18)" />
             </g>
           </svg>
-          <h1 className="font-heading font-bold text-3xl text-white mb-2">Welcome Back</h1>
-          <p className="text-muted text-sm font-light">Enter your credentials to access the portal</p>
+          <h1 className="font-heading font-bold text-3xl text-foreground mb-2">Welcome Back</h1>
+          <p className="text-muted-foreground text-sm font-light">Enter your credentials to access the portal</p>
         </div>
 
         {error && (
@@ -72,14 +72,14 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-xs uppercase tracking-widest text-muted mb-2 font-heading">Email Address</label>
+            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2 font-heading">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted w-5 h-5" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <input 
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-saffron focus:ring-1 focus:ring-saffron transition-all"
+                className="w-full bg-background border border-border rounded-xl py-3 pl-12 pr-4 text-foreground focus:outline-none focus:border-saffron focus:ring-1 focus:ring-saffron transition-all"
                 placeholder="founder@startup.com"
                 required
               />
@@ -87,21 +87,21 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-widest text-muted mb-2 font-heading">Password</label>
+            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2 font-heading">Password</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted w-5 h-5" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <input 
                 type={showPassword ? "text" : "password"} 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-12 text-white focus:outline-none focus:border-saffron focus:ring-1 focus:ring-saffron transition-all"
+                className="w-full bg-background border border-border rounded-xl py-3 pl-12 pr-12 text-foreground focus:outline-none focus:border-saffron focus:ring-1 focus:ring-saffron transition-all"
                 placeholder="••••••••"
                 required
               />
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
