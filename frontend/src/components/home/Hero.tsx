@@ -1,7 +1,63 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import IndiaMap from "./IndiaMap";
 import Link from "next/link";
+
+import { AnimatePresence, motion } from "framer-motion";
+
+const headings = [
+  "BUILDING INDIA'S BOLD FUTURE.",
+  "भारत के सशक्त भविष्य का निर्माण",
+  "ভারতের উজ্জ্বল ভবিষ্যৎ গড়ছি",
+  "भारताचे उज्ज्वल भविष्य घडवत आहोत",
+  "ભારતનું મજબૂત ભવિષ્ય બનાવી રહ્યા છીએ",
+  "இந்தியாவின் தைரியமான எதிர்காலத்தை உருவாக்குகிறோம்",
+  "ಭಾರತದ ಭವ್ಯ ಭವಿಷ್ಯವನ್ನು ನಿರ್ಮಿಸುತ್ತಿದ್ದೇವೆ"
+];
+
+const TypewriterHeading = () => {
+  const [index, setIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentString = headings[index];
+
+    let timer: NodeJS.Timeout;
+    if (isDeleting) {
+      timer = setTimeout(() => {
+        setDisplayedText(prev => prev.slice(0, -1));
+        if (displayedText.length === 0) {
+          setIsDeleting(false);
+          setIndex((prev) => (prev + 1) % headings.length);
+        }
+      }, 20); // Fast delete speed
+    } else {
+      timer = setTimeout(() => {
+        setDisplayedText(currentString.slice(0, displayedText.length + 1));
+        if (displayedText.length === currentString.length) {
+          // Pause before deleting
+          timer = setTimeout(() => setIsDeleting(true), 2500);
+        }
+      }, 50); // Typing speed
+    }
+
+    return () => clearTimeout(timer);
+  }, [displayedText, isDeleting, index]);
+
+  return (
+    <div className="min-h-[90px] md:min-h-[80px] flex items-center justify-start mb-6">
+      <h1 className="h1 !mb-0 text-left w-full !text-3xl md:!text-4xl lg:!text-5xl leading-tight" style={{ textAlign: 'justify', textJustify: 'inter-word' }}>
+        {displayedText}
+        <motion.span
+          animate={{ opacity: [1, 0] }}
+          transition={{ repeat: Infinity, duration: 0.8 }}
+          className="inline-block w-1 md:w-[4px] h-[0.9em] bg-saffron ml-2 align-baseline rounded-sm"
+        />
+      </h1>
+    </div>
+  );
+};
 
 export default function Hero() {
   useEffect(() => {
@@ -10,9 +66,9 @@ export default function Hero() {
       const hm = document.getElementById('hmap');
       if (hm) hm.style.transform = `translateY(calc(-50% + ${sy * .25}px))`;
       const hc = document.querySelector('.hcont') as HTMLElement;
-      if (hc) { 
-        hc.style.opacity = Math.max(0, 1 - sy / 560).toString(); 
-        hc.style.transform = `translateY(${sy * .14}px)`; 
+      if (hc) {
+        hc.style.opacity = Math.max(0, 1 - sy / 560).toString();
+        hc.style.transform = `translateY(${sy * .14}px)`;
       }
     };
     window.addEventListener('scroll', handleScroll);
@@ -28,7 +84,7 @@ export default function Hero() {
         <div className="ey">
           <div className="eyl"></div><span className="eyt">Jaipur HQ · Pan-India · 100 CXOs</span>
         </div>
-        <h1 className="h1">BUILDING<br/><span className="or">INDIA'S</span><br/>BOLD <span className="gr">FUTURE.</span></h1>
+        <TypewriterHeading />
         <p className="hp">A think-tank of 100 CXOs. Three verticals. One mission — to accelerate founders building
           India's next great companies from every corner of the country.</p>
         <div className="hbtns">
