@@ -1,0 +1,311 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  SUB_ADMIN
+  INVESTOR
+  CXO
+  STARTUP_FOUNDER
+}
+
+enum EventStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum StartupStatus {
+  REQUESTED
+  INVITED
+  QUESTIONNAIRE_SUBMITTED
+  AI_PROFILED
+  UNDER_REVIEW
+  LEGAL_ONBOARDING
+  ONBOARDED
+  REJECTED
+}
+
+enum DocumentStatus {
+  REQUESTED
+  UPLOADED
+  READ_BY_STARTUP
+  SIGNED
+}
+
+model SystemSettings {
+  id                  String   @id @default("global")
+  aiProvider          String   @default("OPENAI") // "OPENAI" or "GEMINI"
+  onboardingMode      String   @default("USER_CHOICE") // "AI_ONLY", "FORM_ONLY", "USER_CHOICE"
+  questionnaireSchema Json?
+  updatedAt           DateTime @updatedAt
+}
+
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  passwordHash   String
+  role           Role     @default(STARTUP_FOUNDER)
+  isVerified     Boolean  @default(false)
+  subAdminScopes Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  startup        Startup? @relation("FounderToStartup")
+  investor       InvestorProfile?
+  cxo            CxoProfile?
+  discussions    ThinkTankDiscussion[]
+}
+
+model Startup {
+  id                String        @id @default(uuid())
+  name              String
+  logoUrl           String?
+  industry          String?
+  stage             String?
+  status            StartupStatus @default(REQUESTED)
+  questionnaireData Json?
+  aiProfileData     Json?
+  allocatedHours    Int           @default(0)
+  remainingHours    Int           @default(0)
+  allocatedDays     Int           @default(7)
+  onboardingDeadline DateTime?
+  founderId         String        @unique
+  founder           User          @relation("FounderToStartup", fields: [founderId], references: [id])
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  investments       Investment[]
+  timeLedger        TimeLedger[]
+  events            Event[]
+  documents         Document[]
+  problemReports    ProblemReport[]
+  cxoAssignments    StartupMentorAssignment[]
+  strategicNotes    StrategicNotes[]
+  
+  // Investor Ecosystem Relations
+  visibilities      StartupVisibility[]
+  interests         InvestmentInterest[]
+  dealPipelines     DealPipeline[]
+  dueDiligenceRoom  DueDiligenceRoom?
+}
+
+model InvestorProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  firmName        String?
+  linkedin        String?
+  pan             String?
+  investorType    String?  // ANGEL, VC, FAMILY_OFFICE, SYNDICATE
+  ticketSize      String?
+  sectors         String[]
+  geography       String[]
+  stagePreference String[]
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  investments     Investment[]
+  visibilities    StartupVisibility[]
+  interests       InvestmentInterest[]
+  dealPipelines   DealPipeline[]
+}
+
+model CxoProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  expertise         String[]
+  linkedin          String?
+  bio               String?
+  previousCompanies String[]
+  industries        String[]
+  achievements      String?
+  rating            Float    @default(5.0)
+  status            String   @default("PENDING") // PENDING, INTERVIEWING, ACCEPTED, REJECTED
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  assignments       StartupMentorAssignment[]
+  notes             StrategicNotes[]
+}
+
+model Investment {
+  id              String          @id @default(uuid())
+  startupId       String
+  investorId      String
+  amount          Float
+  equityPercent   Float
+  status          String          @default("PENDING_FUNDS")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  startup         Startup         @relation(fields: [startupId], references: [id])
+  investor        InvestorProfile @relation(fields: [investorId], references: [id])
+}
+
+model TimeLedger {
+  id             String   @id @default(uuid())
+  startupId      String
+  hoursDeducted  Int
+  reason         String
+  timestamp      DateTime @default(now())
+
+  startup        Startup  @relation(fields: [startupId], references: [id])
+}
+
+model Event {
+  id             String      @id @default(uuid())
+  startupId      String
+  heading        String      @default("Meeting")
+  meetingLink    String?
+  mom            String?
+  isOffline      Boolean     @default(false)
+  scheduledAt    DateTime
+  durationHours  Int
+  status         EventStatus @default(SCHEDULED)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  startup        Startup     @relation(fields: [startupId], references: [id])
+}
+
+model Document {
+  id                String         @id @default(uuid())
+  startupId         String
+  heading           String
+  fileUrl           String?
+  signatureRequired Boolean        @default(false)
+  status            DocumentStatus @default(UPLOADED)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  startup           Startup        @relation(fields: [startupId], references: [id])
+}
+
+model ProblemReport {
+  id          String   @id @default(uuid())
+  startupId   String
+  title       String
+  description String
+  isResolved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  startup     Startup  @relation(fields: [startupId], references: [id])
+}
+
+model StartupMentorAssignment {
+  id               String      @id @default(uuid())
+  startupId        String
+  cxoId            String
+  assignmentReason String?
+  status           String      @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  startup          Startup     @relation(fields: [startupId], references: [id])
+  cxo              CxoProfile  @relation(fields: [cxoId], references: [id])
+}
+
+model StrategicNotes {
+  id        String      @id @default(uuid())
+  startupId String
+  cxoId     String
+  content   String
+  type      String      @default("GENERAL") // GENERAL, RISK_ALERT, GROWTH_SUGGESTION
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  startup   Startup     @relation(fields: [startupId], references: [id])
+  cxo       CxoProfile  @relation(fields: [cxoId], references: [id])
+}
+
+model ThinkTankDiscussion {
+  id        String      @id @default(uuid())
+  title     String
+  content   String
+  authorId  String
+  channel   String      @default("GENERAL")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  author    User        @relation(fields: [authorId], references: [id])
+}
+
+model KnowledgeResources {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  fileUrl     String
+  type        String   @default("PLAYBOOK") // PLAYBOOK, CASE_STUDY, FRAMEWORK
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==========================================
+// BHARAT INVESTORS ECOSYSTEM
+// ==========================================
+
+model StartupVisibility {
+  id         String          @id @default(uuid())
+  startupId  String
+  investorId String
+  grantedAt  DateTime        @default(now())
+  
+  startup    Startup         @relation(fields: [startupId], references: [id])
+  investor   InvestorProfile @relation(fields: [investorId], references: [id])
+
+  @@unique([startupId, investorId])
+}
+
+model InvestmentInterest {
+  id         String          @id @default(uuid())
+  startupId  String
+  investorId String
+  message    String?
+  status     String          @default("NEW") // NEW, CONTACTED, PASSED
+  createdAt  DateTime        @default(now())
+  
+  startup    Startup         @relation(fields: [startupId], references: [id])
+  investor   InvestorProfile @relation(fields: [investorId], references: [id])
+}
+
+model DealPipeline {
+  id         String          @id @default(uuid())
+  startupId  String
+  investorId String
+  stage      String          @default("FIRST_MEETING") // FIRST_MEETING, DUE_DILIGENCE, NEGOTIATION, TERM_SHEET, CLOSED
+  notes      String?
+  updatedAt  DateTime        @updatedAt
+  createdAt  DateTime        @default(now())
+
+  startup    Startup         @relation(fields: [startupId], references: [id])
+  investor   InvestorProfile @relation(fields: [investorId], references: [id])
+}
+
+model DueDiligenceRoom {
+  id          String   @id @default(uuid())
+  startupId   String   @unique
+  status      String   @default("LOCKED") // LOCKED, OPEN
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  startup     Startup  @relation(fields: [startupId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String   // e.g. "CXO_INVITED", "STARTUP_APPROVED"
+  entityType String   // e.g. "USER", "STARTUP"
+  entityId   String
+  adminId    String?  // ID of the admin who performed the action
+  details    Json?    // Any additional metadata
+  timestamp  DateTime @default(now())
+}
